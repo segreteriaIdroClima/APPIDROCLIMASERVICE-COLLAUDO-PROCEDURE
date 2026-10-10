@@ -457,7 +457,7 @@ function renderApps(apps) {
                     })
                 }).catch(e => console.error("Log error", e));
 
-                if ((isIos() || (window.IDROCLIMA_RELEASE?.enabled && String(app.id) === String(window.IDROCLIMA_RELEASE.technicalAppId))) && !targetUrl.startsWith('native://')) {
+                if (isIos() && !targetUrl.startsWith('native://')) {
                     // Bypass specifico per iOS: evitiamo iframe a causa del blocco cookie di terze parti (ITP).
                     // Utilizziamo window.location.href per aprire nel Safari View Controller (in PWA) 
                     // o nella stessa scheda senza subire blocchi di popup.
@@ -469,7 +469,8 @@ function renderApps(apps) {
                     if (targetUrl === 'native://timbrature') {
                         openTimbratureNative();
                     } else if (targetUrl === 'native://procedure') {
-                        openDriveViewerNative('procedure', targetName);
+                        if (window.IdroclimaOpenProcedures) window.IdroclimaOpenProcedures();
+                        else openDriveViewerNative('procedure', targetName);
                     } else if (targetUrl === 'native://comunicazioni') {
                         openDriveViewerNative('comunicazioni', targetName);
                     } else if (targetUrl === 'native://modulirapidi') {
@@ -1207,14 +1208,7 @@ window.removeApp = function (idx) {
 
 if (btnAddUser) {
     btnAddUser.addEventListener('click', () => {
-        setAdminDirty(true);
-        let newId = adminUnique('U',adminData.utenti,'ID_UTENTE');
-        adminData.utenti.push({
-            ID_UTENTE: newId, NOME: '', USERNAME: '', PASSWORD_HASH: '',
-            PROFILO: 'TECNICO', ATTIVO: true, IS_ADMIN: false, NOTE: ''
-        });
-        renderUtenti();
-        openNewAdminCard('utenti-container');
+        window.open('https://script.google.com/a/macros/idroclimaservicemilano.it/s/AKfycbxsE9TcuNToeylKmiF3taoxNWOi2_hJyOCmJC8y472W-t7PNlEvMWiNkE79vU-jiXnpJQ/exec','_blank','noopener');
     });
 }
 
@@ -1831,8 +1825,9 @@ const accessNetworkFetch = window.fetch.bind(window);
 let accessCheckInFlight = null;
 let accessValidatedAt = 0, accessValidatedToken = '';
 function markAccessValidated(token) {accessValidatedToken=token;accessValidatedAt=Date.now();}
-const ACCESS_DENIED_CODES = ['INACTIVITY','NOT_IN_ROSTER','BADGE_REASSIGNED','ACCOUNT_DISABLED','ACCOUNT_REMOVED','SESSION_INVALID'];
+const ACCESS_DENIED_CODES = ['INACTIVITY','NOT_IN_ROSTER','ACCESS_NOT_STARTED','BADGE_REASSIGNED','ACCOUNT_DISABLED','ACCOUNT_REMOVED','SESSION_INVALID'];
 function closeProtectedScreens() {
+    window.IdroclimaCloseProcedures?.();
     for (const id of ['home-screen','iframe-screen','drive-viewer-screen','timbrature-screen','admin-screen','monitor-screen','moduli-rapidi-screen']) {
         const element = document.getElementById(id); if (element) element.classList.add('hidden');
     }
