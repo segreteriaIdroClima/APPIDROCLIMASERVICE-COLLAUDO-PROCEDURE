@@ -1,5 +1,5 @@
 const CACHE_SCOPE = 'idroclima-procedures-'+new URL(self.registration.scope).pathname.replace(/[^a-z0-9]/gi,'_');
-const CACHE_NAME = CACHE_SCOPE+'-pwa36';
+const CACHE_NAME = CACHE_SCOPE+'-pwa36a';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -62,13 +62,13 @@ self.addEventListener('fetch', (evt) => {
                     caches.open(CACHE_NAME).then((cache) => cache.put(evt.request, responseCopy));
                     return networkResponse;
                 })
-                .catch(() => caches.match(evt.request,{ignoreSearch:true}))
+                .catch(() => caches.open(CACHE_NAME).then(cache=>cache.match(evt.request,{ignoreSearch:true})))
         );
         return;
     }
 
     evt.respondWith(
-        caches.match(evt.request,{ignoreSearch:true}).then((cachedResponse) => {
+        caches.open(CACHE_NAME).then(cache=>cache.match(evt.request,{ignoreSearch:true})).then((cachedResponse) => {
             return cachedResponse || fetch(evt.request).then((networkResponse) => {
                 if (isLocalAsset) {
                     const responseCopy = networkResponse.clone();
