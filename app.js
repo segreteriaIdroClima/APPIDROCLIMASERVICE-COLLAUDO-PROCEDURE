@@ -457,7 +457,7 @@ function renderApps(apps) {
                     })
                 }).catch(e => console.error("Log error", e));
 
-                if (isIos() && !targetUrl.startsWith('native://')) {
+                if ((isIos() || (window.IDROCLIMA_RELEASE?.enabled && String(app.id) === String(window.IDROCLIMA_RELEASE.technicalAppId))) && !targetUrl.startsWith('native://')) {
                     // Bypass specifico per iOS: evitiamo iframe a causa del blocco cookie di terze parti (ITP).
                     // Utilizziamo window.location.href per aprire nel Safari View Controller (in PWA) 
                     // o nella stessa scheda senza subire blocchi di popup.

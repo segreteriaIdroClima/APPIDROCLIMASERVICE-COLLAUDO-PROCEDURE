@@ -1,5 +1,5 @@
 const CACHE_SCOPE = 'idroclima-procedures-'+new URL(self.registration.scope).pathname.replace(/[^a-z0-9]/gi,'_');
-const CACHE_NAME = CACHE_SCOPE+'-rc1';
+const CACHE_NAME = CACHE_SCOPE+'-android2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -9,6 +9,8 @@ const ASSETS_TO_CACHE = [
     './release-config.js',
     './procedures-day.js',
     './procedures-day.css',
+    './pdf.min.mjs',
+    './pdf.worker.min.mjs',
     './jsQR.js',
     './manifest.json',
     './idroclima-app-192.png',
