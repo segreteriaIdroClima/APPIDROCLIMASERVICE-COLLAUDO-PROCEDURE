@@ -582,7 +582,7 @@ async function runAppTransition(sourceElement, callback) {
     const cleanup=()=>{
         timers.forEach(clearTimeout);
         transitionOverlay.classList.remove('active');
-        setTimeout(()=>{transitionOverlay.classList.add('hidden');clone.remove();appTransitionRunning=false;},600);
+        setTimeout(()=>{transitionOverlay.classList.add('hidden');clone.remove();appTransitionRunning=false;window.dispatchEvent(new Event('IDROCLIMA_APP_TRANSITION_DONE'));},600);
     };
     try {
         // Start server checks and app loading now, under the original animation.
