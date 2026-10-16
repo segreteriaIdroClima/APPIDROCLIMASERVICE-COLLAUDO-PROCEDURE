@@ -90,6 +90,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     screen.addEventListener('input',e=>{if(e.target.type!=='search'&&e.target.closest('.admin-card'))setAdminDirty(true);});
     screen.addEventListener('change',e=>{if(e.target.type!=='search'&&e.target.closest('.admin-card'))setAdminDirty(true);});
     document.getElementById('admin-collapse').addEventListener('click',()=>screen.querySelectorAll('details').forEach(d=>d.open=false));
-    document.getElementById('admin-reload').addEventListener('click',()=>{if(!adminDirty||confirm('Ricaricare e scartare le modifiche non salvate?'))loadAdminData();});
+    document.getElementById('admin-reload').addEventListener('click',async()=>{if(!adminDirty||await IdroclimaMessages.confirm('Ricaricare e scartare le modifiche non salvate?'))loadAdminData();});
     window.addEventListener('beforeunload',e=>{if(adminDirty){e.preventDefault();e.returnValue='';}});
 });

@@ -261,7 +261,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 btnInstall.addEventListener('click', async () => {
     // Seleziona comportamento Apple
     if (isIos() && !isInStandaloneMode()) {
-        alert("PER INSTALLARE SU APPLE iOS:\n\n1. Tocca l'icona 'Condividi' (il quadrato con la freccia rivolta in alto) nella barra inferiore di Safari.\n2. Scorri il menÃ¹ e tocca 'Aggiungi alla schermata Home' o 'Aggiungi a Home'.");
+        IdroclimaMessages.alert("PER INSTALLARE SU APPLE iOS:\n\n1. Tocca l'icona 'Condividi' (il quadrato con la freccia rivolta in alto) nella barra inferiore di Safari.\n2. Scorri il menÃ¹ e tocca 'Aggiungi alla schermata Home' o 'Aggiungi a Home'.");
         return;
     }
 
@@ -271,7 +271,7 @@ btnInstall.addEventListener('click', async () => {
         deferredPrompt = null;
         btnInstall.classList.add('hidden');
     } else if (!isIos()) {
-        alert("Per installare l'app:\n\n1. Apri il menu del browser.\n2. Tocca 'Installa app' oppure 'Aggiungi a schermata Home'.\n\nSe il pulsante non compare nel menu, ricarica la pagina dopo qualche secondo.");
+        IdroclimaMessages.alert("Per installare l'app:\n\n1. Apri il menu del browser.\n2. Tocca 'Installa app' oppure 'Aggiungi a schermata Home'.\n\nSe il pulsante non compare nel menu, ricarica la pagina dopo qualche secondo.");
     }
 });
 
@@ -483,7 +483,7 @@ function renderApps(apps) {
         } else {
             card.onclick = (e) => {
                 e.preventDefault();
-                alert(`Accesso non abilitato al profilo '${currentUser.profilo}' per questa App.`);
+                IdroclimaMessages.alert(`Accesso non abilitato al profilo '${currentUser.profilo}' per questa App.`);
             };
         }
 
@@ -788,8 +788,8 @@ function showAdminScreen() {
     loadAdminData();
 }
 
-btnAdminBack.addEventListener('click', () => {
-    if (adminDirty && !confirm('Hai modifiche non salvate. Vuoi uscire e scartarle?')) return;
+btnAdminBack.addEventListener('click', async () => {
+    if (adminDirty && !await IdroclimaMessages.confirm('Hai modifiche non salvate. Vuoi uscire e scartarle?')) return;
     setAdminDirty(false);
     adminScreen.classList.add('hidden');
     document.body.classList.remove('fullscreen-active');
@@ -815,7 +815,7 @@ if (btnSharePortal) {
                 btnSharePortal.style.color = '';
             }, 2000);
         }).catch(err => {
-            alert("Errore durante la copia del link: " + err);
+            IdroclimaMessages.alert("Errore durante la copia del link: " + err);
         });
     });
 }
@@ -849,11 +849,11 @@ async function loadAdminData() {
             setAdminDirty(false);
             renderAdminDashboard();
         } else {
-            alert("Errore Admin: " + data.message);
+            IdroclimaMessages.alert("Errore Admin: " + data.message);
             btnAdminBack.click();
         }
     } catch (e) {
-        alert("Errore caricamento dati admin.");
+        IdroclimaMessages.alert("Errore caricamento dati admin.");
         btnAdminBack.click();
     } finally {
         adminLoading.classList.add('hidden');
@@ -1107,9 +1107,9 @@ function updateGruppoData(e) {
     if (field === 'ID_PROFILO') { renderUtenti(); renderPermessi(); }
 }
 
-window.removeGruppo = function (idx) {
-    if (adminData.utenti.some(u => u.PROFILO === adminData.profili[idx].ID_PROFILO)) {alert('Sposta prima gli utenti in un altro gruppo.');return;}
-    if (confirm("Sei sicuro di eliminare questo gruppo?")) {
+window.removeGruppo = async function (idx) {
+    if (adminData.utenti.some(u => u.PROFILO === adminData.profili[idx].ID_PROFILO)) {IdroclimaMessages.alert('Sposta prima gli utenti in un altro gruppo.');return;}
+    if (await IdroclimaMessages.confirm("Sei sicuro di eliminare questo gruppo?")) {
         adminData.profili.splice(idx, 1);
         setAdminDirty(true);
         renderGruppi();
@@ -1183,8 +1183,8 @@ function updateAppData(e) {
     }
 }
 
-window.removeUtente = function (idx) {
-    if (confirm("Sei sicuro di eliminare questo utente? Verranno rimossi anche i suoi permessi specifici.")) {
+window.removeUtente = async function (idx) {
+    if (await IdroclimaMessages.confirm("Sei sicuro di eliminare questo utente? Verranno rimossi anche i suoi permessi specifici.")) {
         let utenteRemoved = adminData.utenti[idx];
         adminData.permessi = adminData.permessi.filter(p => p.ID_UTENTE !== utenteRemoved.ID_UTENTE);
         adminData.utenti.splice(idx, 1);
@@ -1194,8 +1194,8 @@ window.removeUtente = function (idx) {
     }
 };
 
-window.removeApp = function (idx) {
-    if (confirm("Sei sicuro di eliminare questa App? Verranno rimossi anche i relativi permessi.")) {
+window.removeApp = async function (idx) {
+    if (await IdroclimaMessages.confirm("Sei sicuro di eliminare questa App? Verranno rimossi anche i relativi permessi.")) {
         let appRemoved = adminData.apps[idx];
         // Rimuovi anche i permessi orfani
         adminData.permessi = adminData.permessi.filter(p => p.ID_APP !== appRemoved.ID_APP);
@@ -1259,7 +1259,7 @@ btnAdminSave.addEventListener('click', async () => {
     btnAdminSave.disabled = true;
 
     const validation = validateAdminData();
-    if (validation) {alert(validation);btnAdminSave.disabled=false;btnAdminSave.textContent='Salva';return;}
+    if (validation) {IdroclimaMessages.alert(validation);btnAdminSave.disabled=false;btnAdminSave.textContent='Salva';return;}
     const permessiEstesi = buildAdminPermissions(adminData,groupPerms);
 
     try {
@@ -1281,12 +1281,12 @@ btnAdminSave.addEventListener('click', async () => {
             adminData.permessi = permessiEstesi;
             setAdminDirty(false);
             await loadAdminData();
-            alert('Salvataggio completato con successo!');
+            IdroclimaMessages.alert('Salvataggio completato con successo!');
         } else {
-            alert('Errore al salvataggio: ' + data.message);
+            IdroclimaMessages.alert('Errore al salvataggio: ' + data.message);
         }
     } catch (e) {
-        alert('Errore di rete al salvataggio.');
+        IdroclimaMessages.alert('Errore di rete al salvataggio.');
     } finally {
         btnAdminSave.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salva';
         btnAdminSave.disabled = false;
@@ -1578,10 +1578,10 @@ if (btnSaveKeywords) {
                     renderDriveFiles(currentDriveFiles);
                 }
             } else {
-                alert('Errore salvataggio: ' + data.message);
+                IdroclimaMessages.alert('Errore salvataggio: ' + data.message);
             }
         } catch (error) {
-            alert('Errore di rete al salvataggio.');
+            IdroclimaMessages.alert('Errore di rete al salvataggio.');
         } finally {
             btnSaveKeywords.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salva';
             btnSaveKeywords.disabled = false;
@@ -1675,7 +1675,7 @@ function getDip() {
     const id = currentUser.id || currentUser.ID_UTENTE;
     const nome = currentUser.nome;
     if (!id) {
-        alert("Errore: Utente non riconosciuto!");
+        IdroclimaMessages.alert("Errore: Utente non riconosciuto!");
         return null;
     }
     return { id, nome };
@@ -1714,15 +1714,15 @@ async function sendModuloRequest(moduloType, payload, btn) {
         });
         const data = await response.json();
         if (data.status === 'success') {
-            alert('Richiesta inviata con successo!');
+            IdroclimaMessages.alert('Richiesta inviata con successo!');
             goMenu(); // Torna al menu
             return true;
         } else {
-            alert('Errore: ' + data.message);
+            IdroclimaMessages.alert('Errore: ' + data.message);
             return false;
         }
     } catch (error) {
-        alert('Errore di rete. Riprova più tardi.');
+        IdroclimaMessages.alert('Errore di rete. Riprova più tardi.');
         return false;
     } finally {
         resetBtn(btn);
@@ -1731,7 +1731,7 @@ async function sendModuloRequest(moduloType, payload, btn) {
 
 async function inviaSuggerimento(btn) {
     const testo = document.getElementById('sug_testo').value.trim();
-    if (!testo) return alert("Scrivi un suggerimento!");
+    if (!testo) return IdroclimaMessages.alert("Scrivi un suggerimento!");
     setBtnLoading(btn, 'INVIO...');
     const ok = await sendModuloRequest('suggerimenti', { testo }, btn);
     if (ok) document.getElementById('sug_testo').value = '';
@@ -1740,7 +1740,7 @@ async function inviaSuggerimento(btn) {
 async function inviaAttrezzi(btn) {
     const dip = getDip(); if (!dip) return;
     const desc = document.getElementById('att_desc').value.trim();
-    if (!desc) return alert("Descrivi l'attrezzo!");
+    if (!desc) return IdroclimaMessages.alert("Descrivi l'attrezzo!");
     const file = document.getElementById('att_foto').files[0];
     setBtnLoading(btn, 'INVIO IN CORSO...');
     const b64 = await getBase64(file);
@@ -1752,7 +1752,7 @@ async function inviaMezzi(btn) {
     const dip = getDip(); if (!dip) return;
     const targa = document.getElementById('mez_targa').value.trim();
     const desc = document.getElementById('mez_desc').value.trim();
-    if (!targa || !desc) return alert("Inserisci targa e descrizione!");
+    if (!targa || !desc) return IdroclimaMessages.alert("Inserisci targa e descrizione!");
     const file = document.getElementById('mez_foto').files[0];
     setBtnLoading(btn, 'INVIO IN CORSO...');
     const b64 = await getBase64(file);
@@ -1765,7 +1765,7 @@ async function inviaPermessi(btn) {
     const tipo = document.getElementById('per_tipo').value;
     const dal = document.getElementById('per_dal').value;
     const al = document.getElementById('per_al').value;
-    if (!dal || !al) return alert("Inserisci le date!");
+    if (!dal || !al) return IdroclimaMessages.alert("Inserisci le date!");
     setBtnLoading(btn, 'INVIO...');
     const ok = await sendModuloRequest('permessi', { id: dip.id, nome: dip.nome, tipologia: tipo, dal: dal, al: al, causale: document.getElementById('per_note').value }, btn);
     if (ok) { document.getElementById('per_dal').value = ''; document.getElementById('per_al').value = ''; document.getElementById('per_note').value = ''; }
@@ -1811,13 +1811,13 @@ window.navigateFolder = function(id, name) {
 async function resendEmployeeInvite(index, button) {
   const user = adminData.utenti[index];
   if (!user) return;
-  if (adminDirty) {alert('Salva prima le modifiche: l’invito usa le credenziali già salvate.');return;}
+  if (adminDirty) {IdroclimaMessages.alert('Salva prima le modifiche: l’invito usa le credenziali già salvate.');return;}
   button.disabled = true;
   try {
     const response = await authenticatedFetch(API_URL, {method:'POST',body:JSON.stringify({action:'RESEND_EMPLOYEE_INVITE',adminUserId:currentUser.id || currentUser.ID_UTENTE,employeeId:user.ID_UTENTE})});
     const result = await response.json();
-    alert(result.message || (result.status === 'success' ? 'Invito inviato' : 'Invio fallito'));
-  } catch(e) {alert('Invio fallito: ' + e.message);} finally {button.disabled=false;}
+    IdroclimaMessages.alert(result.message || (result.status === 'success' ? 'Invito inviato' : 'Invio fallito'));
+  } catch(e) {IdroclimaMessages.alert('Invio fallito: ' + e.message);} finally {button.disabled=false;}
 }
 
 
