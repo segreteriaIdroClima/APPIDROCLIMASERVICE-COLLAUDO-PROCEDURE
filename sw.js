@@ -1,5 +1,5 @@
 const CACHE_SCOPE = 'idroclima-procedures-'+new URL(self.registration.scope).pathname.replace(/[^a-z0-9]/gi,'_');
-const CACHE_NAME = CACHE_SCOPE+'-pwa40-final';
+const CACHE_NAME = CACHE_SCOPE+'-pwa41';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -8,6 +8,9 @@ const ASSETS_TO_CACHE = [
     './admin-tools.js',
     './messages.js',
     './messages.css',
+    './loading-ui.js',
+    './loading-ui.css',
+    './idroclima-drop-180.png',
     './release-config.js',
     './procedures-day.js',
     './procedures-day.css',

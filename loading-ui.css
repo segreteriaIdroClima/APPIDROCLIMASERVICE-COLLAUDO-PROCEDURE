@@ -1,0 +1,18 @@
+/* Goccia Idroclima: stessa attesa delle procedure, in tre dimensioni. */
+.icl-art{--icl-size:116px;position:relative;display:inline-grid;place-items:center;flex:none;width:var(--icl-size);height:var(--icl-size);vertical-align:middle;margin:10px auto 24px;isolation:isolate}
+.icl-art img{display:block;width:58%;height:58%;object-fit:contain;filter:drop-shadow(0 7px 18px #00b4d633);animation:icl-breathe 2.4s ease-in-out infinite}
+.icl-art>.icl-ring{position:absolute;inset:7%;border:1px solid #27badb66;border-radius:50%;animation:icl-ripple 2.4s ease-out infinite;pointer-events:none}
+.icl-art>.icl-ring:nth-child(2){animation-delay:1.2s}
+.icl-art>.icl-track{position:absolute;bottom:-12px;left:8%;right:8%;height:3px;overflow:hidden;border-radius:3px;background:#1c3448}
+.icl-track::after{content:"";display:block;width:35%;height:100%;border-radius:3px;background:linear-gradient(90deg,#0588af,#60d5e3);animation:icl-flow 1.6s ease-in-out infinite}
+.icl-art--small{--icl-size:30px;margin:0 8px 0 0;vertical-align:middle}.icl-art--small .icl-track{display:none}.icl-art--small img{width:70%;height:70%}
+.icl-art--medium{--icl-size:68px;margin:8px auto 20px}
+.icl-art.hidden,.icl-art[hidden]{display:none!important}
+.loading-state>.icl-art,.loader-card>.icl-art{display:grid}.loading-state{color:#a5bbce}.loader-card{text-align:center}
+.icl-busy::before{content:"";display:inline-block;vertical-align:middle;width:24px;height:26px;margin-right:8px;background:var(--icl-logo) center/contain no-repeat;filter:drop-shadow(0 2px 7px #00b4d644);animation:icl-breathe 2.4s ease-in-out infinite}
+.icl-select-wait{display:block;text-align:center;margin:2px 0 8px}.icl-select-wait .icl-art{margin:0}.icl-select-wait[hidden]{display:none!important}
+.icl-outcome-art{display:grid;justify-content:center;text-align:center}.icl-outcome-art[hidden]{display:none}
+@keyframes icl-breathe{50%{transform:translateY(-4px);filter:drop-shadow(0 9px 22px #00b4d655)}}
+@keyframes icl-ripple{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.2);opacity:0}}
+@keyframes icl-flow{0%{transform:translateX(-110%)}100%{transform:translateX(390%)}}
+@media(prefers-reduced-motion:reduce){.icl-art img,.icl-art>.icl-ring,.icl-track::after,.icl-busy::before{animation:none}.icl-art>.icl-ring:nth-child(2){display:none}.icl-track::after{width:100%}}
