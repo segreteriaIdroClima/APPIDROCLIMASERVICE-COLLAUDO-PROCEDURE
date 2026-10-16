@@ -19,7 +19,8 @@
     function paint(){
       document.querySelectorAll(statusSelector).forEach(node=>{const busy=busyText.test(node.textContent.trim());if(node.classList.contains('icl-busy')!==busy)node.classList.toggle('icl-busy',busy);});
       document.querySelectorAll('button:disabled,button.icl-busy').forEach(node=>{
-        const busy=node.disabled && /invio|invia|salv|carica|ricarica|verifica|controlla|manda/i.test(node.textContent) && !node.querySelector('.icl-art');
+        const requestButton=['btnLoad','btnSendRecensione','btnInviaTsPayEmail','btnSendRichiestaUfficio','btn-admin-save','btn-save-keywords'].includes(node.id);
+        const busy=node.disabled && (requestButton||/invio|salvataggio|caricamento/i.test(node.textContent)) && !node.querySelector('.icl-art');
         if(node.classList.contains('icl-busy')!==busy)node.classList.toggle('icl-busy',busy);
       });
       document.querySelectorAll('select').forEach(node=>{
