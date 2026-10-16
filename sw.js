@@ -1,5 +1,5 @@
 const CACHE_SCOPE = 'idroclima-procedures-'+new URL(self.registration.scope).pathname.replace(/[^a-z0-9]/gi,'_');
-const CACHE_NAME = CACHE_SCOPE+'-pwa40';
+const CACHE_NAME = CACHE_SCOPE+'-pwa40-final';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -22,7 +22,7 @@ const ASSETS_TO_CACHE = [
 
 self.addEventListener('install', (evt) => {
     evt.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE.map(asset=>new Request(new URL(asset,self.registration.scope),{cache:'reload'}))))
     );
     self.skipWaiting();
 });
@@ -58,7 +58,7 @@ self.addEventListener('fetch', (evt) => {
 
     if (isFreshAsset) {
         evt.respondWith(
-            fetch(evt.request)
+            fetch(evt.request,{cache:'no-cache'})
                 .then((networkResponse) => {
                     const responseCopy = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(evt.request, responseCopy));
