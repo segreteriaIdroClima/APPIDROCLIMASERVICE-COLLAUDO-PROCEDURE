@@ -497,82 +497,10 @@ input:checked+.slider:before {
     transform: translateX(20px);
 }
 
-/* --- TRANSITION ANIMATION --- */
-#transition-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0%, #0f172a 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-}
-
-#transition-overlay.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-#transition-icon-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.transition-clone {
-    position: fixed;
-    z-index: 10000;
-    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    pointer-events: none;
-}
-
-.transition-clone.moving {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) scale(1.5) rotate(0deg);
-}
-
-.transition-clone.spinning {
-    transform: translate(-50%, -50%) scale(1.5) rotate(720deg);
-    transition: transform 1.2s cubic-bezier(0.45, 0, 0.55, 1);
-}
-
-.transition-clone.zooming {
-    transform: translate(-50%, -50%) scale(50) rotate(1080deg);
-    opacity: 0;
-    transition: transform 0.8s ease-in, opacity 0.6s ease-in;
-}
-
-/* Fix for FontAwesome icons in transition */
-.transition-clone i {
-    font-size: 40px;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    background: var(--primary-color);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-}
-
-.transition-clone img {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
-}
+/* Attesa reale all'apertura: nessuna rotazione, zoom o dissolvenza obbligatoria. */
+#transition-overlay {position:fixed;inset:0;width:100vw;height:100dvh;background:radial-gradient(ellipse at 50% 35%,#143044,#08121f 70%);z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:all;}
+#transition-overlay.hidden {display:none;}
+#transition-icon-container {display:flex;align-items:center;justify-content:center;}
 
 /* --- MONITOR DASHBOARD --- */
 .quota-card {
@@ -1184,9 +1112,11 @@ input:checked+.slider:before {
  #admin-screen .admin-toolbar > span {flex-basis:100%;}
 }
 .app-card, .btn-icon, button {touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-.transition-clone {will-change:transform,opacity;}
+
 #portal-connection-status {position:fixed;bottom:12px;left:12px;right:12px;z-index:11000;display:flex;align-items:center;gap:12px;background:#17243b;border:1px solid #64748b;border-radius:12px;padding:12px;color:#fff;font-size:14px;box-shadow:0 4px 20px #0004;}
 #portal-connection-status.hidden {display:none;}
 #portal-connection-status span {flex:1;}
 #portal-connection-status button {padding:10px 14px;border:0;border-radius:8px;background:var(--primary-color);color:#fff;cursor:pointer;}
 @media (pointer:coarse) {#transition-overlay {backdrop-filter:none;-webkit-backdrop-filter:none;}}
+
+.app-frame-wait{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0b1424;color:#a5bbce;text-align:center;pointer-events:none}.app-frame-wait p{margin:12px 0;font-size:14px}

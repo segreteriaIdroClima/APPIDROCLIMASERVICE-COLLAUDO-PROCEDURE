@@ -467,12 +467,12 @@ function renderApps(apps) {
 
 
                     if (targetUrl === 'native://timbrature') {
-                        openTimbratureNative();
+                        return openTimbratureNative();
                     } else if (targetUrl === 'native://procedure') {
-                        if (window.IdroclimaOpenProcedures) window.IdroclimaOpenProcedures();
-                        else openDriveViewerNative('procedure', targetName);
+                        if (window.IdroclimaOpenProcedures) return window.IdroclimaOpenProcedures();
+                        else return openDriveViewerNative('procedure', targetName);
                     } else if (targetUrl === 'native://comunicazioni') {
-                        openDriveViewerNative('comunicazioni', targetName);
+                        return openDriveViewerNative('comunicazioni', targetName);
                     } else if (targetUrl === 'native://modulirapidi') {
                         openModuliRapidiNative();
                     } else {
@@ -529,9 +529,7 @@ function renderApps(apps) {
         adminCard.href = '#';
         adminCard.onclick = (e) => {
             e.preventDefault();
-            runAppTransition(adminCard, () => {
-                showAdminScreen();
-            });
+            runAppTransition(adminCard, () => showAdminScreen());
         };
         adminCard.innerHTML = `
             <div class="app-icon" style="background-color: #10b981;">
@@ -559,40 +557,32 @@ function bindAppTap(card) {
     card.onclick=event=>{if(Date.now()-lastTouch<700){event.preventDefault();return;}return open(event);};
 }
 
-// Logica Transizione Premium
+// L'attesa copre solo il lavoro reale: nessuna durata minima o animazione in coda.
 let appTransitionRunning = false;
 async function runAppTransition(sourceElement, callback) {
     if (appTransitionRunning) return;
-    const icon = sourceElement.querySelector('img') || sourceElement.querySelector('.app-icon');
-    if (!icon) return callback();
     appTransitionRunning = true;
-    const rect = icon.getBoundingClientRect(), clone = icon.cloneNode(true);
-    const bgColor = window.getComputedStyle(icon).backgroundColor;
-    Object.assign(clone.style,{margin:'0',position:'fixed',top:rect.top+'px',left:rect.left+'px',width:rect.width+'px',height:rect.height+'px'});
-    if (icon.classList.contains('app-icon')) clone.style.backgroundColor=bgColor;
-    clone.classList.add('transition-clone');document.body.appendChild(clone);
+    const artwork = window.IdroclimaLoading?.artwork();
+    if (artwork) transitionIconContainer.replaceChildren(artwork);
+    transitionOverlay.setAttribute('role','status');
+    transitionOverlay.setAttribute('aria-label','Apertura applicazione in corso');
     transitionOverlay.classList.remove('hidden');
-    const timers=[];
-    const later=(fn,ms)=>timers.push(setTimeout(fn,ms));
-    later(()=>transitionOverlay.classList.add('active'),10);
-    later(()=>clone.classList.add('moving'),50);
-    later(()=>clone.classList.add('spinning'),850);
-    later(()=>clone.classList.add('zooming'),2100);
-    const animationDone=new Promise(resolve=>later(resolve,3200));
-    const cleanup=()=>{
-        timers.forEach(clearTimeout);
-        transitionOverlay.classList.remove('active');
-        setTimeout(()=>{transitionOverlay.classList.add('hidden');clone.remove();appTransitionRunning=false;window.dispatchEvent(new Event('IDROCLIMA_APP_TRANSITION_DONE'));},600);
-    };
+    transitionOverlay.classList.add('active');
     try {
-        // Start server checks and app loading now, under the original animation.
-        const result = await callback();
-        if (result !== false) await animationDone;
-    } catch(error) {console.error('Apertura app:',error);}
-    finally {cleanup();}
+        // Il callback viene eseguito subito: l'animazione non ritarda le richieste.
+        return await callback();
+    } catch(error) { console.error('Apertura app:',error); }
+    finally {
+        transitionOverlay.classList.remove('active');
+        transitionOverlay.classList.add('hidden');
+        transitionIconContainer.replaceChildren();
+        appTransitionRunning = false;
+        window.dispatchEvent(new Event('IDROCLIMA_APP_TRANSITION_DONE'));
+    }
 }
 
 // Logica Apertura App in iFrame
+let iframeWaitCleanup = null;
 function openAppInIframe(nome, url, appId = '') {
     document.body.style.overflow = 'hidden';
     hideHomeForFullscreenView();
@@ -641,10 +631,31 @@ function openAppInIframe(nome, url, appId = '') {
     appIframe.style.zoom = '1';
     appIframe.setAttribute('scrolling', 'yes');
 
+    // L'iframe naviga subito; l'attesa interna termina al suo evento load/error.
+    // La barra di chiusura rimane utilizzabile anche con una rete lenta.
+    iframeWaitCleanup?.();
+    const waiting = document.createElement('div');
+    waiting.className = 'app-frame-wait';
+    waiting.setAttribute('role','status');
+    waiting.setAttribute('aria-label','Caricamento applicazione');
+    const artwork = window.IdroclimaLoading?.artwork();
+    if (artwork) waiting.appendChild(artwork);
+    const label = document.createElement('p');label.textContent = 'Caricamento applicazione…';waiting.appendChild(label);
+    wrapper.appendChild(waiting);
+    const complete = () => {
+        waiting.remove();
+        appIframe.removeEventListener('load',complete);
+        appIframe.removeEventListener('error',complete);
+        if (iframeWaitCleanup === complete) iframeWaitCleanup = null;
+    };
+    iframeWaitCleanup = complete;
+    appIframe.addEventListener('load',complete);
+    appIframe.addEventListener('error',complete);
     appIframe.src = url;
 }
 
 btnCloseIframe.addEventListener('click', () => {
+    iframeWaitCleanup?.();
     iframeScreen.classList.add('hidden');
     appIframe.src = ''; // Svuota per fermare processi in background
     iframeScreen.style.zIndex = ''; // Ripristina z-index se modificato
@@ -785,7 +796,7 @@ function showAdminScreen() {
     hideHomeForFullscreenView();
     homeScreen.classList.add('hidden');
     adminScreen.classList.remove('hidden');
-    loadAdminData();
+    return loadAdminData();
 }
 
 btnAdminBack.addEventListener('click', async () => {
@@ -1341,7 +1352,7 @@ function openDriveViewerNative(type, title) {
         }
     }
 
-    fetchDriveFiles(type);
+    return fetchDriveFiles(type);
 }
 
 if (btnCloseDriveViewer) {
@@ -1546,7 +1557,7 @@ if (keywordInput) {
 
 if (btnSaveKeywords) {
     btnSaveKeywords.addEventListener('click', async () => {
-        btnSaveKeywords.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btnSaveKeywords.textContent = 'Salvataggio…';
         btnSaveKeywords.disabled = true;
 
         try {

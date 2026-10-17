@@ -1,0 +1,29 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verifica attesa reale — PWA42</title><link rel="stylesheet" href="style.css?v=pwa42"><link rel="stylesheet" href="loading-ui.css?v=pwa42"><script src="loading-ui.js?v=pwa42" defer></script><style>body{background:#091421;color:#edf4ff;font:16px/1.6 Inter,Arial,sans-serif}main{max-width:560px;padding:28px;margin:auto}button{border:1px solid #247a9f;background:#104c66;color:#eefaff;padding:14px 20px;border-radius:14px;font:inherit;cursor:pointer;margin:8px}#transition-icon-container{flex-direction:column}#transition-icon-container p{color:#9ebbcf;text-align:center}small{color:#59c3dc;letter-spacing:.15em}#result{padding:20px;border:1px solid #2d4a5b;border-radius:15px}.qa-complete{margin-top:20px}</style></head><body><main><small>IDROCLIMA SERVICE</small><h1>La tua app, appena è pronta</h1><p>Verifica con dati dimostrativi. Nessuna richiesta ai servizi aziendali.</p><button id="quick">Apri contenuto già pronto</button><button id="slow">Simula caricamento in corso</button><p id="result" role="status">Nessun caricamento avviato.</p></main><div id="transition-overlay" class="hidden"><div id="transition-icon-container"></div></div><script>
+const transitionOverlay=document.getElementById('transition-overlay'),transitionIconContainer=document.getElementById('transition-icon-container');
+let appTransitionRunning = false;
+async function runAppTransition(sourceElement, callback) {
+    if (appTransitionRunning) return;
+    appTransitionRunning = true;
+    const artwork = window.IdroclimaLoading?.artwork();
+    if (artwork) transitionIconContainer.replaceChildren(artwork);
+    transitionOverlay.setAttribute('role','status');
+    transitionOverlay.setAttribute('aria-label','Apertura applicazione in corso');
+    transitionOverlay.classList.remove('hidden');
+    transitionOverlay.classList.add('active');
+    try {
+        // Il callback viene eseguito subito: l'animazione non ritarda le richieste.
+        return await callback();
+    } catch(error) { console.error('Apertura app:',error); }
+    finally {
+        transitionOverlay.classList.remove('active');
+        transitionOverlay.classList.add('hidden');
+        transitionIconContainer.replaceChildren();
+        appTransitionRunning = false;
+        window.dispatchEvent(new Event('IDROCLIMA_APP_TRANSITION_DONE'));
+    }
+}
+
+
+document.getElementById('quick').onclick=async()=>{const start=performance.now();await runAppTransition(null,()=>Promise.resolve());document.getElementById('result').textContent='Contenuto pronto: '+Math.round(performance.now()-start)+' ms. Nessuna attesa minima.';};
+document.getElementById('slow').onclick=async()=>{document.getElementById('result').textContent='Caricamento in background iniziato subito.';await runAppTransition(null,()=>new Promise(resolve=>{const label=document.createElement('p');label.textContent='Caricamento in background';transitionIconContainer.append(label);const complete=document.createElement('button');complete.className='qa-complete';complete.textContent='Completa la risposta simulata';complete.onclick=resolve;transitionIconContainer.append(complete);}));document.getElementById('result').textContent='Risposta ricevuta: copertura rimossa, senza animazione successiva.';};
+</script></body></html>
