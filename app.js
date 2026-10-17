@@ -425,6 +425,18 @@ async function loadApps() {
     }
 }
 
+/* Standard symbols on the company's blue/orange faceted drop. */
+function utilityIconForApp(app) {
+    const name = String(app.nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const kind = app.link === 'native://comunicazioni' || /comunicazion/.test(name) ? 'communications' : /richiest/.test(name) && /paus/.test(name) ? 'requests' : '';
+    if (!kind) return '';
+    const symbol = kind === 'communications'
+        ? '<path d="M26 43h9l17-8v28l-17-8h-9z"/><path d="m32 55 4 12h7l-4-10M57 41l7-4m-7 12h9m-9 8 7 4"/>'
+        : '<rect x="26" y="33" width="40" height="33" rx="5"/><path d="M26 43h40M35 29v9m22-9v9M40 51v8m12-8v8"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 92"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b9edff"/><stop offset=".45" stop-color="#318fbc"/><stop offset="1" stop-color="#123c69"/></linearGradient><linearGradient id="o" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd49a"/><stop offset="1" stop-color="#d87d35"/></linearGradient></defs><path d="M46 4 75 55c13 25-5 34-29 34S4 80 17 55z" fill="url(#b)" stroke="#b2dce9" stroke-opacity=".7"/><path d="m46 4-9 55 9 30-29-34z" fill="#a6d9e8" opacity=".42"/><path d="m46 4 8 55-8 30 29-34z" fill="#102c56" opacity=".46"/><path d="m18 64 28 18 28-18c-2 18-13 25-28 25S20 82 18 64" fill="url(#o)"/><g fill="none" stroke="#f3fbff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">'+symbol+'</g></svg>';
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
 function renderApps(apps) {
     if (apps.length === 0) {
         appsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Nessuna applicazione disponibile.</p>';
@@ -487,7 +499,7 @@ function renderApps(apps) {
             };
         }
 
-        const iconClass = app.icona ? app.icona : 'fa-folder';
+        const iconClass = utilityIconForApp(app) || app.icona || 'fa-folder';
         const iconColor = app.colore ? app.colore : 'var(--primary-color)';
 
         let isImage = false;
