@@ -849,6 +849,7 @@ async function loadAdminData() {
         if (data.status === 'success') {
             adminData = {
                 utenti: data.utenti,
+                accountsReadOnly: data.accountsReadOnly === true,
                 profili: data.profili,
                 apps: data.apps,
                 permessi: data.permessi,
@@ -988,6 +989,13 @@ function renderUtenti() {
         container.appendChild(card);
     });
     compactAdminCards('utenti-container');
+    if (adminData.accountsReadOnly) {
+        container.querySelectorAll('input,select,button').forEach(control=>control.disabled=true);
+        const add=document.getElementById('btn-add-user');if(add)add.hidden=true;
+        let note=document.getElementById('trial-accounts-note');
+        if(!note){note=document.createElement('p');note.id='trial-accounts-note';note.className='admin-hint';container.before(note);}
+        note.textContent='Account e personale reali in sola lettura. App, gruppi e permessi sono modificabili soltanto in questa copia di prova.';
+    }
 
     // Aggiungi event listeners
     document.querySelectorAll('.u-input').forEach(el => el.addEventListener('change', updateUtenteData));
@@ -1280,7 +1288,7 @@ btnAdminSave.addEventListener('click', async () => {
                 action: 'SAVE_ADMIN_DATA',
                 revision: adminData.revision,
                 adminUserId: currentUser.id || currentUser.ID_UTENTE,
-                utenti_aggiornati: adminData.utenti,
+                utenti_aggiornati: adminData.accountsReadOnly ? undefined : adminData.utenti,
                 apps_aggiornate: adminData.apps,
                 profili_aggiornati: adminData.profili,
                 permessi_aggiornati: permessiEstesi
