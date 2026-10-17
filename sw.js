@@ -1,5 +1,5 @@
 const CACHE_SCOPE = 'idroclima-procedures-'+new URL(self.registration.scope).pathname.replace(/[^a-z0-9]/gi,'_');
-const CACHE_NAME = CACHE_SCOPE+'-pwa43';
+const CACHE_NAME = CACHE_SCOPE+'-pwa44';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
