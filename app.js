@@ -991,7 +991,7 @@ function renderUtenti() {
     compactAdminCards('utenti-container');
     if (adminData.accountsReadOnly) {
         container.querySelectorAll('input,select,button').forEach(control=>control.disabled=true);
-        const add=document.getElementById('btn-add-user');if(add)add.hidden=true;
+        const add=document.getElementById('btn-add-user');if(add){add.hidden=true;add.disabled=true;add.style.display='none';}
         let note=document.getElementById('trial-accounts-note');
         if(!note){note=document.createElement('p');note.id='trial-accounts-note';note.className='admin-hint';container.before(note);}
         note.textContent='Account e personale reali in sola lettura. App, gruppi e permessi sono modificabili soltanto in questa copia di prova.';
